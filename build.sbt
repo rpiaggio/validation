@@ -5,8 +5,6 @@ lazy val root = project.in(file(".")).
 
 lazy val validation = crossProject.in(file(".")).
   settings(
-    scalaVersion := "2.12.0",
-    crossScalaVersions := Seq("2.11.0", "2.12.0"),
     scalacOptions ++= Seq("-deprecation", "-feature"),
     organization := "io.underscore",
     name := "validation",
@@ -31,4 +29,4 @@ lazy val validationJS = validation.js
 
 scalaVersion := "2.12.0"
 
-crossScalaVersions := Seq("2.11.0")
+crossScalaVersions := Seq("2.11.0", "2.12.0")
