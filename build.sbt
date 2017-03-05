@@ -30,3 +30,5 @@ lazy val validationJS = validation.js
 scalaVersion := "2.12.0"
 
 crossScalaVersions := Seq("2.11.0", "2.12.0")
+
+packagedArtifacts in file(".") := Map.empty
