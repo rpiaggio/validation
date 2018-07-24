@@ -20,7 +20,9 @@ abstract class Validator[A, F[_] : Monad] extends (A => F[Seq[ValidationResult]]
       }
     }
 
-  private def liftWith[G[_] : Monad](transform: F ~> G): Validator[A, G] = Validator[A, G] { in => this (in).liftTo[G](transform) }
+  def liftWith[G[_] : Monad](transform: F ~> G): Validator[A, G] = Validator[A, G] { in => this (in).liftTo[G](transform) }
+
+  def liftTo[G[_] : Monad](implicit transformation: NaturalTransformation[F, G, G]): Validator[A, G] = liftWith(transformation.asInstanceOf[DirectTransformation[F, G]].transform)
 
   def and[G[_] : Monad, R[_]](that: Validator[A, G])(implicit transformation: NaturalTransformation[F, G, R]): Validator[A, R] = transformation match {
     case DirectTransformation(transform) => (this.liftWith(transform.asInstanceOf[F ~> G]) andSame that).asInstanceOf[Validator[A, R]]

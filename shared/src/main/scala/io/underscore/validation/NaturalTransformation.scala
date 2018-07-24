@@ -18,6 +18,9 @@ trait NaturalTransformationLowPriorityImplicits extends ReverseTransformationImp
   implicit def monadTransform[T[_] : Monad]: NaturalTransformation[Id, T, T] = DirectTransformation(new (Id ~> T) {
     override def apply[A](a: Id[A]): T[A] = Monad[T].pure(a)
   })
+
+  implicit def monadTransformWrap[T[_] : Monad, S[_] : Monad](implicit arrow: T ~> S): NaturalTransformation[T, S, S] =
+    DirectTransformation(arrow)
 }
 
 trait NaturalTransformationImplicits extends NaturalTransformationLowPriorityImplicits {
