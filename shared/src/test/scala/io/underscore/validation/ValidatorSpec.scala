@@ -1,6 +1,5 @@
 package io.underscore.validation
 
-import cats.Id
 import org.specs2.mutable._
 
 class ValidatorSpec extends Specification {
@@ -23,7 +22,7 @@ class ValidatorSpec extends Specification {
   }
 
   "validate[A]" >> {
-    val validator = validate[Int]
+    val validator = Validator[Int]
     validator(+1) mustEqual pass
     validator(-1) mustEqual pass
   }

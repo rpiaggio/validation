@@ -24,14 +24,15 @@ trait Validators {
   def warn(msg: => String): Seq[ValidationResult] =
     Seq(ValidationWarning(msg))
 
-  def validate[A]: Validator[A, Id] =
-    Validator[A, Id] { in => pass }
 
-  def validate[A](msg: => String)(func: A => Boolean): Validator[A, Id] =
-    validate[A, Id](msg)(func)
+  class ValidateGen[A](msg: => String) {
+    def apply[F[_] : Monad](func: A => F[Boolean]): Validator[A, F] =
+      Validator[A, F] { in => func(in).map { valid => if (valid) pass else fail(msg) } }
 
-  def validate[A, F[_] : Monad](msg: => String)(func: A => F[Boolean]): Validator[A, F] =
-    Validator[A, F] { in => func(in).map { valid => if (valid) pass else fail(msg) } }
+    def apply(func: A => Boolean): Validator[A, Id] = apply[Id](func)
+  }
+
+  def validate[A](msg: => String = "") = new ValidateGen[A](msg)
 
   def warn[A, F[_] : Monad](rule: Validator[A, F]): Validator[A, F] =
     Validator[A, F] { in => rule(in).map(_.toWarnings) }
@@ -49,80 +50,80 @@ trait Validators {
     eql(comp, s"Must be $comp")
 
   def eql[A](comp: A, msg: => String): Validator[A, Id] =
-    Validator[A, Id] { in => if(in == comp) pass else fail(msg) }
+    Validator[A, Id] { in => if (in == comp) pass else fail(msg) }
 
   def neq[A](comp: A): Validator[A, Id] =
     neq(comp, s"Must not be $comp")
 
   def neq[A](comp: A, msg: => String): Validator[A, Id] =
-    Validator[A, Id] { in => if(in == comp) fail(msg) else pass }
+    Validator[A, Id] { in => if (in == comp) fail(msg) else pass }
 
   def lt[A](comp: A)(implicit order: Ordering[_ >: A]): Validator[A, Id] =
     lt(comp, s"Must be less than $comp")
 
   def lt[A](comp: A, msg: => String)(implicit order: Ordering[_ >: A]): Validator[A, Id] =
-    Validator[A, Id] { in => if(order.lt(in, comp)) pass else fail(msg) }
+    Validator[A, Id] { in => if (order.lt(in, comp)) pass else fail(msg) }
 
   def lte[A](comp: A)(implicit order: Ordering[_ >: A]): Validator[A, Id] =
     lte(comp, s"Must be $comp or less")
 
   def lte[A](comp: A, msg: => String)(implicit order: Ordering[_ >: A]): Validator[A, Id] =
-    Validator[A, Id] { in => if(order.lteq(in, comp)) pass else fail(msg) }
+    Validator[A, Id] { in => if (order.lteq(in, comp)) pass else fail(msg) }
 
   def gt[A](comp: A)(implicit order: Ordering[_ >: A]): Validator[A, Id] =
     gt(comp, s"Must be greater than $comp")
 
   def gt[A](comp: A, msg: => String)(implicit order: Ordering[_ >: A]): Validator[A, Id] =
-    Validator[A, Id] { in => if(order.gt(in, comp)) pass else fail(msg) }
+    Validator[A, Id] { in => if (order.gt(in, comp)) pass else fail(msg) }
 
   def gte[A](comp: A)(implicit order: Ordering[_ >: A]): Validator[A, Id] =
     gte(comp, s"Must be $comp or higher")
 
   def gte[A](comp: A, msg: => String)(implicit order: Ordering[_ >: A]): Validator[A, Id] =
-    Validator[A, Id] { in => if(order.gteq(in, comp)) pass else fail(msg) }
-  
+    Validator[A, Id] { in => if (order.gteq(in, comp)) pass else fail(msg) }
+
   def nonEmpty[E, S <% Seq[E]]: Validator[S, Id] =
     nonEmpty(s"Must not be empty")
 
   def nonEmpty[E, S <% Seq[E]](msg: => String): Validator[S, Id] =
-    Validator[S, Id] { in => if(in.isEmpty) fail(msg) else pass }
+    Validator[S, Id] { in => if (in.isEmpty) fail(msg) else pass }
 
   def lengthLt[E, S <% Seq[E]](comp: Int): Validator[S, Id] =
     lengthLt(comp, s"Length must be less than $comp")
 
   def lengthLt[E, S <% Seq[E]](comp: Int, msg: => String): Validator[S, Id] =
-    Validator[S, Id] { in => if(in.length < comp) pass else fail(msg) }
+    Validator[S, Id] { in => if (in.length < comp) pass else fail(msg) }
 
   def lengthLte[E, S <% Seq[E]](comp: Int): Validator[S, Id] =
     lengthLte(comp, s"Length must be at most $comp")
 
   def lengthLte[E, S <% Seq[E]](comp: Int, msg: => String): Validator[S, Id] =
-    Validator[S, Id] { in => if(in.length <= comp) pass else fail(msg) }
+    Validator[S, Id] { in => if (in.length <= comp) pass else fail(msg) }
 
   def lengthGt[E, S <% Seq[E]](comp: Int): Validator[S, Id] =
     lengthGt(comp, s"Length must be more than $comp")
 
   def lengthGt[E, S <% Seq[E]](comp: Int, msg: => String): Validator[S, Id] =
-    Validator[S, Id] { in => if(in.length > comp) pass else fail(msg) }
+    Validator[S, Id] { in => if (in.length > comp) pass else fail(msg) }
 
   def lengthGte[E, S <% Seq[E]](comp: Int): Validator[S, Id] =
     lengthGte(comp, s"Length must be at least $comp")
 
   def lengthGte[E, S <% Seq[E]](comp: Int, msg: => String): Validator[S, Id] =
-    Validator[S, Id] { in => if(in.length >= comp) pass else fail(msg) }
+    Validator[S, Id] { in => if (in.length >= comp) pass else fail(msg) }
 
   def matchesRegex(regex: Regex, msg: => String): Validator[String, Id] =
-    Validator[String, Id] { in => if(regex.findFirstIn(in).isDefined) pass else fail(msg) }
+    Validator[String, Id] { in => if (regex.findFirstIn(in).isDefined) pass else fail(msg) }
 
   def notContainedIn[A](values: => Seq[A]): Validator[A, Id] =
     notContainedIn(values, s"Must not be one of the values ${values.mkString(", ")}")
 
   def notContainedIn[A](values: => Seq[A], msg: => String): Validator[A, Id] =
-    Validator[A, Id] { in => if(values contains in) fail(msg) else pass }
+    Validator[A, Id] { in => if (values contains in) fail(msg) else pass }
 
   def containedIn[A](values: => Seq[A]): Validator[A, Id] =
     containedIn(values, s"Must be one of the values ${values.mkString(", ")}")
 
   def containedIn[A](values: => Seq[A], msg: => String): Validator[A, Id] =
-    Validator[A, Id] { in => if(values contains in) pass else fail(msg) }
+    Validator[A, Id] { in => if (values contains in) pass else fail(msg) }
 }

@@ -73,6 +73,10 @@ abstract class Validator[A, F[_] : Monad] extends (A => F[Seq[ValidationResult]]
 }
 
 object Validator {
+  def apply[A] = Validator[A, Id] {
+    _ => pass
+  }
+
   def apply[A, F[_] : Monad](func: A => F[Seq[ValidationResult]]): Validator[A, F] = new Validator[A, F] {
     def apply(in: A) = func(in)
   }
