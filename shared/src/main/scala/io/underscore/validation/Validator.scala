@@ -41,35 +41,35 @@ abstract class Validator[A, F[_] : Monad] extends (A => F[Seq[ValidationResult]]
   def prefix[B: ValidationPathPrefix](prefixes: B*): Validator[A, F] =
     Validator[A, F] { in => this (in).map(_.prefix(prefixes: _*)) }
 
-  def field[B, G[_] : Monad, R[_]](field: String, accessor: A => B)(implicit validator: Validator[B, G], transformation: NaturalTransformation[F, G, R]): Validator[A, R] =
+  def field[B, G[_] : Monad, R[_]](field: String, accessor: A => B)(validator: Validator[B, G])(implicit transformation: NaturalTransformation[F, G, R]): Validator[A, R] =
     this and (validator contramap accessor prefix field)
 
-  //  def field[B](accessor: A => B)(implicit validator: Validator[B]): Validator[A] =
-  //  macro ValidationMacros.field[A, B]
+  def field[B, G[_] : Monad, R[_]](accessor: A => B)(validator: Validator[B, G])(implicit transformation: NaturalTransformation[F, G, R]): Validator[A, R] =
+  macro ValidationMacros.field[A, B, F, G, R]
 
-  def fieldWith[B, G[_] : Monad, R[_]](field: String, accessor: A => B)(implicit validatorBuilder: A => Validator[B, G], transformation: NaturalTransformation[F, G, R]): Validator[A, R] =
+  def fieldWith[B, G[_] : Monad, R[_]](field: String, accessor: A => B)(validatorBuilder: A => Validator[B, G])(implicit transformation: NaturalTransformation[F, G, R]): Validator[A, R] =
     this and Validator[A, G] { value =>
       val validator = validatorBuilder(value) contramap accessor prefix field
       validator(value)
     }
 
-  //  def fieldWith[B](accessor: A => B)(implicit validatorBuilder: A => Validator[B]): Validator[A] =
-  //  macro ValidationMacros.fieldWith[A, B]
+  def fieldWith[B, G[_] : Monad, R[_]](accessor: A => B)(validatorBuilder: A => Validator[B, G])(implicit transformation: NaturalTransformation[F, G, R]): Validator[A, R] =
+  macro ValidationMacros.fieldWith[A, B, F, G, R]
 
-  def seqField[B, G[_] : Monad, R[_]](field: String, accessor: A => Seq[B])(implicit validator: Validator[B, G], transformation: NaturalTransformation[F, G, R]): Validator[A, R] =
+  def seqField[B, G[_] : Monad, R[_]](field: String, accessor: A => Seq[B])(validator: Validator[B, G])(implicit transformation: NaturalTransformation[F, G, R]): Validator[A, R] =
     this and (validator.seq contramap accessor prefix field)
 
-  //  def seqField[B](accessor: A => Seq[B])(implicit validator: Validator[B]): Validator[A] =
-  //  macro ValidationMacros.seqField[A, B]
+  def seqField[B, G[_] : Monad, R[_]](accessor: A => Seq[B])(validator: Validator[B, G])(implicit transformation: NaturalTransformation[F, G, R]): Validator[A, R] =
+  macro ValidationMacros.seqField[A, B, F, G, R]
 
-  def seqFieldWith[B, G[_] : Monad, R[_]](field: String, accessor: A => Seq[B])(implicit validatorBuilder: A => Validator[B, G], transformation: NaturalTransformation[F, G, R]): Validator[A, R] =
+  def seqFieldWith[B, G[_] : Monad, R[_]](field: String, accessor: A => Seq[B])(validatorBuilder: A => Validator[B, G])(implicit transformation: NaturalTransformation[F, G, R]): Validator[A, R] =
     this and Validator[A, G] { value =>
       val validator = validatorBuilder(value).seq contramap accessor prefix field
       validator(value)
     }
 
-  //  def seqFieldWith[B](accessor: A => Seq[B])(implicit validatorBuilder: A => Validator[B]): Validator[A] =
-  //  macro ValidationMacros.seqFieldWith[A, B]
+  def seqFieldWith[B, G[_] : Monad, R[_]](accessor: A => Seq[B])(validatorBuilder: A => Validator[B, G])(implicit transformation: NaturalTransformation[F, G, R]): Validator[A, R] =
+  macro ValidationMacros.seqFieldWith[A, B, F, G, R]
 }
 
 object Validator {

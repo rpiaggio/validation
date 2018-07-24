@@ -1,39 +1,30 @@
 package io.underscore.validation
 
+import scala.language.higherKinds
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox.Context
 
 class ValidationMacros(val c: Context) {
   import c.universe._
 
-  def field[A, B](accessor: c.Tree)(validator: c.Tree): c.Tree = {
+  def field[A, B, F[_], G[_], R[_]](accessor: c.Tree)(validator: c.Tree)(evidence: c.Tree, transformation: c.Tree): c.Tree = {
     val name = accessorName(accessor)
-    q"${c.prefix}.field(${name.toString}, _.${name})($validator)"
+    q"${c.prefix}.field(${name.toString}, _.${name})($validator)($evidence, $transformation)"
   }
 
-  def fieldWith[A, B](accessor: c.Tree)(validatorBuilder: c.Tree): c.Tree = {
+  def fieldWith[A, B, F[_], G[_], R[_]](accessor: c.Tree)(validatorBuilder: c.Tree)(evidence: c.Tree, transformation: c.Tree): c.Tree = {
     val name = accessorName(accessor)
-    q"${c.prefix}.fieldWith(${name.toString}, _.${name})($validatorBuilder)"
+    q"${c.prefix}.fieldWith(${name.toString}, _.${name})($validatorBuilder)($evidence, $transformation)"
   }
 
-  def seqField[A, B](accessor: c.Tree)(validator: c.Tree): c.Tree = {
+  def seqField[A, B, F[_], G[_], R[_]](accessor: c.Tree)(validator: c.Tree)(evidence: c.Tree, transformation: c.Tree): c.Tree = {
     val name = accessorName(accessor)
-    q"${c.prefix}.seqField(${name.toString}, _.${name})($validator)"
+    q"${c.prefix}.seqField(${name.toString}, _.${name})($validator)($evidence, $transformation)"
   }
 
-  def seqFieldWith[A, B](accessor: c.Tree)(validatorBuilder: c.Tree): c.Tree = {
+  def seqFieldWith[A, B, F[_], G[_], R[_]](accessor: c.Tree)(validatorBuilder: c.Tree)(evidence: c.Tree, transformation: c.Tree): c.Tree = {
     val name = accessorName(accessor)
-    q"${c.prefix}.seqFieldWith(${name.toString}, _.${name})($validatorBuilder)"
-  }
-
-  def fieldUpdate[A, B](accessor: c.Tree)(validator: c.Tree): c.Tree = {
-    val name = accessorName(accessor)
-    q"${c.prefix}.field(${name.toString}, _.${name})($validator)"
-  }
-
-  def seqFieldUpdate[A, B](accessor: c.Tree)(validator: c.Tree): c.Tree = {
-    val name = accessorName(accessor)
-    q"${c.prefix}.seqField(${name.toString}, _.${name})($validator)"
+    q"${c.prefix}.seqFieldWith(${name.toString}, _.${name})($validatorBuilder)($evidence, $transformation)"
   }
 
   private def accessorName(accessor: c.Tree) = accessor match {
