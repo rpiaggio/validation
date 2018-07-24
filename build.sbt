@@ -18,7 +18,6 @@ lazy val validation = crossProject(JSPlatform, JVMPlatform).in(file(".")).
     name := "validation",
     version := "0.0.4",
     publishTo := Some(Resolver.file("file", new File("../maven-repo"))),
-    resolvers += Resolver.sonatypeRepo("public"),
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "org.typelevel" %% "cats-core" % "1.1.0",
