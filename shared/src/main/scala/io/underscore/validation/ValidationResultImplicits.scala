@@ -1,5 +1,7 @@
 package io.underscore.validation
 
+import scala.language.higherKinds
+
 trait ValidationResultImplicits {
   implicit class SeqValidationResultOps(results: Seq[ValidationResult]) {
     def hasErrors: Boolean =

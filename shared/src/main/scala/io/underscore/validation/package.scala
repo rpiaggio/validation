@@ -1,12 +1,17 @@
 package io.underscore
 
-import scala.language.implicitConversions
+import cats._
+import cats.implicits._
 
-package object validation extends Validators with ValidationResultImplicits with ValidationPathImplicits {
-  implicit class ValidatableOps[A : Validator](in: A) {
-    def validate = implicitly[Validator[A]] apply in withValue in
+import scala.language.implicitConversions
+import scala.language.higherKinds
+
+package object validation extends Validators with ValidationResultImplicits with ValidationPathImplicits with NaturalTransformationImplicits {
+
+  implicit class ValidatableOps[A, F[_] : Monad](in: A) {
+    def validate(implicit validator: Validator[A, F]): F[Validated[A]] = (validator apply in).map(_ withValue in)
   }
 
-  implicit def functionToValidator[A](func: A => Seq[ValidationResult]): Validator[A] =
-    Validator[A] { in => func(in) }
+  implicit def functionToValidator[A, F[_] : Monad](func: A => F[Seq[ValidationResult]]): Validator[A, F] =
+    Validator[A, F] { in => func(in) }
 }
