@@ -18,12 +18,14 @@ lazy val validation = crossProject(JSPlatform, JVMPlatform).in(file(".")).
     name := "validation",
     version := "0.0.4",
     publishTo := Some(Resolver.file("file", new File("../maven-repo"))),
+    resolvers += Resolver.sonatypeRepo("public"),
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "org.typelevel" %% "cats-core" % "1.1.0",
       "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.5",
       "org.specs2" %% "specs2-core" % "3.8.8" % "test",
-      "io.monix" %% "monix" % "3.0.0-RC1" % "test"
+      "io.monix" %% "monix" % "3.0.0-RC1" % "test",
+      "org.scalaz" %% "scalaz-zio" % "0.1-SNAPSHOT" % "test"
     ),
     scalacOptions in Test ++= Seq("-Yrangepos")
   )
