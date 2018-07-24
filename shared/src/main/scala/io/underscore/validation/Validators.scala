@@ -27,6 +27,9 @@ trait Validators {
   def validate[A]: Validator[A, Id] =
     Validator[A, Id] { in => pass }
 
+  def validate[A](msg: => String)(func: A => Boolean): Validator[A, Id] =
+    validate[A, Id](msg)(func)
+
   def validate[A, F[_] : Monad](msg: => String)(func: A => F[Boolean]): Validator[A, F] =
     Validator[A, F] { in => func(in).map { valid => if (valid) pass else fail(msg) } }
 

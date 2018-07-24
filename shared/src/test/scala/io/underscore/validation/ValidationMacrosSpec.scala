@@ -1,27 +1,28 @@
 package io.underscore.validation
 
+import cats._
 import org.specs2.mutable._
 
-class ValicationMacrosSpec extends Specification {
+class ValidationMacrosSpec extends Specification {
   case class Address(house: Int, street: String)
   case class Person(name: String, age: Int, address: Address)
   case class Business(name: String, addresses: Seq[Address])
 
-  implicit val addressValidator: Validator[Address] =
+  implicit val addressValidator: Validator[Address, Id] =
     validate[Address].
     field(_.house)(warn(gte(1))).
     field(_.street)(warn(nonEmpty))
 
-  implicit val personValidator: Validator[Person] =
+  implicit val personValidator: Validator[Person, Id] =
     validate[Person].
     field(_.name)(nonEmpty).
     field(_.age)(gte(1)).
-    field(_.address)
+    field(_.address)(addressValidator)
 
-  implicit val businessValidator: Validator[Business] =
+  implicit val businessValidator: Validator[Business, Id] =
     validate[Business].
     field(_.name)(nonEmpty).
-    seqField(_.addresses)
+    seqField(_.addresses)(addressValidator)
 
   "validator.field" should {
     "produce errors and warnings with correct paths" in {

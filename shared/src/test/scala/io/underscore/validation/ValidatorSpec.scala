@@ -1,5 +1,6 @@
 package io.underscore.validation
 
+import cats.Id
 import org.specs2.mutable._
 
 class ValidatorSpec extends Specification {
@@ -98,37 +99,37 @@ class ValidatorSpec extends Specification {
   }
   
   "nonEmpty" >> {
-    val validator: Validator[String] = nonEmpty("fail")
+    val validator: Validator[String, Id] = nonEmpty("fail")
     validator("")  mustEqual fail("fail")
     validator(" ") mustEqual pass
   }
 
   "nonEmpty non String" >> {
-    val validator: Validator[Seq[Int]] = nonEmpty("fail")
+    val validator: Validator[Seq[Int], Id] = nonEmpty("fail")
     validator(List():List[Int])  mustEqual fail("fail")
     validator(List(1,2,3,4,5,6)) mustEqual pass
   }  
   
   "lengthLt"  >> {
-    val validator: Validator[Seq[Int]] = lengthLt(6)
+    val validator: Validator[Seq[Int], Id] = lengthLt(6)
     validator(List(1,2,3,4,5,6))   mustEqual fail("Length must be less than 6")
     validator(List():List[Int])    mustEqual pass
   }
   
   "lengthLte" >> {
-    val validator: Validator[Seq[Int]] = lengthLte(6)
+    val validator: Validator[Seq[Int], Id] = lengthLte(6)
     validator(List(1,2,3,4,5,6))     mustEqual pass
     validator(List(1,2,3,4,5,6,7))   mustEqual fail("Length must be at most 6")    
   }  
   
   "lengthGt"  >> {
-    val validator: Validator[Seq[Int]] = lengthGt(6)
+    val validator: Validator[Seq[Int], Id] = lengthGt(6)
     validator(List(1,2,3,4,5,6))    mustEqual fail("Length must be more than 6")
     validator(List(1,2,3,4,5,6,7))  mustEqual pass     
   }  
   
   "lengthGte" >> {
-    val validator: Validator[Seq[Int]] = lengthGte(6)
+    val validator: Validator[Seq[Int], Id] = lengthGte(6)
     validator(List(1,2,3,4,5))    mustEqual fail("Length must be at least 6")
     validator(List(1,2,3,4,5,6))  mustEqual pass     
   }
