@@ -67,7 +67,7 @@ class MonadicValidatorSpec extends Specification {
   "Id, Future and Task unique non-empty email (as Future)" >> { implicit ec: ExecutionContext =>
     implicit val transformation: Task ~> Future = taskToFuture
 
-    val validator = nonEmptyString and isUniqueTask and isEmailFuture
+    val validator = isUniqueTask and isEmailFuture and nonEmptyString
     Await.result(validator("dave@example.com"), Duration.Inf) mustEqual pass
     Await.result(validator("raul@example.com"), Duration.Inf) mustEqual fail("Email is already registered")
     Await.result(validator("raul@"), Duration.Inf)            mustEqual fail("Must be an email")
