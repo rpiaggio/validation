@@ -3,6 +3,9 @@ package io.underscore.validation
 import cats.{Id, _}
 import cats.implicits._
 
+import Emptyable._
+import Sizeable._
+
 import scala.util.matching.Regex
 import scala.math.Ordering
 import scala.language.higherKinds
@@ -85,35 +88,35 @@ trait Validators {
   def gte[A](comp: A, msg: => String)(implicit order: Ordering[_ >: A]): Validator[A, Id] =
     Validator[A, Id] { in => if (order.gteq(in, comp)) pass else fail(msg) }
 
-  def nonEmpty[E, S <% Seq[E]]: Validator[S, Id] =
+  def nonEmpty[E : Emptyable]: Validator[E, Id] =
     nonEmpty(s"Must not be empty")
 
-  def nonEmpty[E, S <% Seq[E]](msg: => String): Validator[S, Id] =
-    Validator[S, Id] { in => if (in.isEmpty) fail(msg) else pass }
+  def nonEmpty[E : Emptyable](msg: => String): Validator[E, Id] =
+    Validator[E, Id] { in => if (in.isEmpty) fail(msg) else pass }
 
-  def lengthLt[E, S <% Seq[E]](comp: Int): Validator[S, Id] =
+  def lengthLt[E : Sizeable](comp: Int): Validator[E, Id] =
     lengthLt(comp, s"Length must be less than $comp")
 
-  def lengthLt[E, S <% Seq[E]](comp: Int, msg: => String): Validator[S, Id] =
-    Validator[S, Id] { in => if (in.length < comp) pass else fail(msg) }
+  def lengthLt[E : Sizeable](comp: Int, msg: => String): Validator[E, Id] =
+    Validator[E, Id] { in => if (in.size < comp) pass else fail(msg) }
 
-  def lengthLte[E, S <% Seq[E]](comp: Int): Validator[S, Id] =
+  def lengthLte[E : Sizeable](comp: Int): Validator[E, Id] =
     lengthLte(comp, s"Length must be at most $comp")
 
-  def lengthLte[E, S <% Seq[E]](comp: Int, msg: => String): Validator[S, Id] =
-    Validator[S, Id] { in => if (in.length <= comp) pass else fail(msg) }
+  def lengthLte[E : Sizeable](comp: Int, msg: => String): Validator[E, Id] =
+    Validator[E, Id] { in => if (in.size <= comp) pass else fail(msg) }
 
-  def lengthGt[E, S <% Seq[E]](comp: Int): Validator[S, Id] =
+  def lengthGt[E : Sizeable](comp: Int): Validator[E, Id] =
     lengthGt(comp, s"Length must be more than $comp")
 
-  def lengthGt[E, S <% Seq[E]](comp: Int, msg: => String): Validator[S, Id] =
-    Validator[S, Id] { in => if (in.length > comp) pass else fail(msg) }
+  def lengthGt[E : Sizeable](comp: Int, msg: => String): Validator[E, Id] =
+    Validator[E, Id] { in => if (in.size > comp) pass else fail(msg) }
 
-  def lengthGte[E, S <% Seq[E]](comp: Int): Validator[S, Id] =
+  def lengthGte[E : Sizeable](comp: Int): Validator[E, Id] =
     lengthGte(comp, s"Length must be at least $comp")
 
-  def lengthGte[E, S <% Seq[E]](comp: Int, msg: => String): Validator[S, Id] =
-    Validator[S, Id] { in => if (in.length >= comp) pass else fail(msg) }
+  def lengthGte[E : Sizeable](comp: Int, msg: => String): Validator[E, Id] =
+    Validator[E, Id] { in => if (in.size >= comp) pass else fail(msg) }
 
   def matchesRegex(regex: Regex, msg: => String): Validator[String, Id] =
     Validator[String, Id] { in => if (regex.findFirstIn(in).isDefined) pass else fail(msg) }

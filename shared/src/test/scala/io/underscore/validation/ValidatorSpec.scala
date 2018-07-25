@@ -22,7 +22,7 @@ class ValidatorSpec extends Specification {
   }
 
   "validate[A]" >> {
-    val validator = Validator[Int]
+    val validator = validate[Int]
     validator(+1) mustEqual pass
     validator(-1) mustEqual pass
   }
@@ -98,37 +98,37 @@ class ValidatorSpec extends Specification {
   }
   
   "nonEmpty" >> {
-    val validator: ValidatorId[String] = nonEmpty("fail")
+    val validator = nonEmpty[String]("fail")
     validator("")  mustEqual fail("fail")
     validator(" ") mustEqual pass
   }
 
   "nonEmpty non String" >> {
-    val validator: ValidatorId[Seq[Int]] = nonEmpty("fail")
+    val validator = nonEmpty[Seq[Int]]("fail")
     validator(List():List[Int])  mustEqual fail("fail")
     validator(List(1,2,3,4,5,6)) mustEqual pass
   }  
   
   "lengthLt"  >> {
-    val validator: ValidatorId[Seq[Int]] = lengthLt(6)
+    val validator = lengthLt[Seq[Int]](6)
     validator(List(1,2,3,4,5,6))   mustEqual fail("Length must be less than 6")
     validator(List():List[Int])    mustEqual pass
   }
   
   "lengthLte" >> {
-    val validator: ValidatorId[Seq[Int]] = lengthLte(6)
+    val validator = lengthLte[Seq[Int]](6)
     validator(List(1,2,3,4,5,6))     mustEqual pass
     validator(List(1,2,3,4,5,6,7))   mustEqual fail("Length must be at most 6")    
   }  
   
   "lengthGt"  >> {
-    val validator: ValidatorId[Seq[Int]] = lengthGt(6)
+    val validator = lengthGt[Seq[Int]](6)
     validator(List(1,2,3,4,5,6))    mustEqual fail("Length must be more than 6")
     validator(List(1,2,3,4,5,6,7))  mustEqual pass     
   }  
   
   "lengthGte" >> {
-    val validator: ValidatorId[Seq[Int]] = lengthGte(6)
+    val validator = lengthGte[Seq[Int]](6)
     validator(List(1,2,3,4,5))    mustEqual fail("Length must be at least 6")
     validator(List(1,2,3,4,5,6))  mustEqual pass     
   }

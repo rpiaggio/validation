@@ -21,7 +21,7 @@ class MonadicValidatorSpec extends Specification {
   def existsInDBTask(email: String): Task[Boolean] = Task(db.contains(email))
   def existsInDBIO(email: String): IO[Boolean] = IO(db.contains(email))
 
-  val nonEmptyString: ValidatorId[String] = nonEmpty
+  val nonEmptyString = nonEmpty[String]
   val nonEmptyStringIO = nonEmptyString.liftTo[IO]
   val isEmail = matchesRegex("^[^@]+@[^@]+$".r, "Must be an email")
   val isEmailFuture = isEmail.liftTo[Future]
