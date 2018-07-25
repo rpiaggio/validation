@@ -25,14 +25,16 @@ trait Validators {
     Seq(ValidationWarning(msg))
 
 
-  class ValidateGen[A](msg: => String) {
+  def validate[A]: Validator[A, Id] = Validator[A]
+
+  class TestGenerator[A](msg: => String) {
     def apply[F[_] : Monad](func: A => F[Boolean]): Validator[A, F] =
       Validator[A, F] { in => func(in).map { valid => if (valid) pass else fail(msg) } }
 
     def apply(func: A => Boolean): Validator[A, Id] = apply[Id](func)
   }
 
-  def validate[A](msg: => String = "") = new ValidateGen[A](msg)
+  def test[A](msg: => String = "") = new TestGenerator[A](msg)
 
   def warn[A, F[_] : Monad](rule: Validator[A, F]): Validator[A, F] =
     Validator[A, F] { in => rule(in).map(_.toWarnings) }

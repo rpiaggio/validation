@@ -25,9 +25,9 @@ class MonadicValidatorSpec extends Specification {
   val nonEmptyStringIO = nonEmptyString.liftTo[IO]
   val isEmail = matchesRegex("^[^@]+@[^@]+$".r, "Must be an email")
   val isEmailFuture = isEmail.liftTo[Future]
-  def isUniqueFuture(implicit ec: ExecutionContext) = validate[String]("Email is already registered") { email => existsInDBFuture(email).map(!_) }
-  val isUniqueTask = validate[String]("Email is already registered") { email => existsInDBTask(email).map(!_) }
-  val isUniqueIO = validate[String]("Email is already registered") { email => existsInDBIO(email).map(!_) }
+  def isUniqueFuture(implicit ec: ExecutionContext) = test[String]("Email is already registered") { email => existsInDBFuture(email).map(!_) }
+  val isUniqueTask = test[String]("Email is already registered") { email => existsInDBTask(email).map(!_) }
+  val isUniqueIO = test[String]("Email is already registered") { email => existsInDBIO(email).map(!_) }
 
   val futureToTask: Future ~> Task = new (Future ~> Task) {
     override def apply[A](f: Future[A]): Task[A] = Task.deferFuture(f)

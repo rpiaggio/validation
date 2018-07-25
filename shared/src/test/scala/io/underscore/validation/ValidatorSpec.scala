@@ -27,7 +27,7 @@ class ValidatorSpec extends Specification {
     validator(-1) mustEqual pass
   }
 
-  val isEven = validate[Int]("Value must be even")(i => i % 2 == 0)
+  val isEven = test[Int]("Value must be even")(i => i % 2 == 0)
 
   "validate(message)(test)" >> {
     val validator = isEven
