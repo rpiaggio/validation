@@ -24,6 +24,7 @@ trait Validators {
   def warn(msg: => String): Seq[ValidationResult] =
     Seq(ValidationWarning(msg))
 
+  def valid[A]: Validator[A, Id] = Validator[A]
 
   def validate[A]: Validator[A, Id] = Validator[A]
 

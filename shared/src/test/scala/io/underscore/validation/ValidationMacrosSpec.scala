@@ -9,18 +9,18 @@ class ValidationMacrosSpec extends Specification {
   case class Business(name: String, addresses: Seq[Address])
 
   implicit val addressValidator: Validator[Address, Id] =
-    Validator[Address].
+    validate[Address].
     field(_.house)(warn(gte(1))).
     field(_.street)(warn(nonEmpty))
 
   implicit val personValidator: Validator[Person, Id] =
-    Validator[Person].
+    validate[Person].
     field(_.name)(nonEmpty).
     field(_.age)(gte(1)).
     field(_.address)(addressValidator)
 
   implicit val businessValidator: Validator[Business, Id] =
-    Validator[Business].
+    validate[Business].
     field(_.name)(nonEmpty).
     seqField(_.addresses)(addressValidator)
 
