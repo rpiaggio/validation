@@ -31,7 +31,7 @@ trait Validators {
 
   def validate[A]: Validator[A, Id] = Validator[A]
 
-  class TestGenerator[A](msg: => String) {
+  class TestGenerator[A] protected[validation](msg: => String) {
     def apply[F[_] : Monad](func: A => F[Boolean]): Validator[A, F] =
       Validator[A, F] { in => func(in).map { valid => if (valid) pass else fail(msg) } }
 

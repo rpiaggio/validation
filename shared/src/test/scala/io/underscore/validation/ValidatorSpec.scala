@@ -27,6 +27,12 @@ class ValidatorSpec extends Specification {
     validator(-1) mustEqual pass
   }
 
+  "Validator[A](func)" >> {
+    val validator = Validator[Int] { _: Int => pass }
+    validator(+1) mustEqual pass
+    validator(-1) mustEqual pass
+  }
+
   val isEven = test[Int]("Value must be even")(i => i % 2 == 0)
 
   "validate(message)(test)" >> {
@@ -43,101 +49,101 @@ class ValidatorSpec extends Specification {
 
   "optional" >> {
     val validator = optional(isEven)
-    validator(None)    mustEqual pass
+    validator(None) mustEqual pass
     validator(Some(0)) mustEqual pass
     validator(Some(1)) mustEqual fail("Value must be even")
   }
 
   "required" >> {
     val validator = required(isEven)
-    validator(None)    mustEqual fail("Value is required")
+    validator(None) mustEqual fail("Value is required")
     validator(Some(0)) mustEqual pass
     validator(Some(1)) mustEqual fail("Value must be even")
   }
 
   "eql" >> {
     val validator = eql(0, "fail")
-    validator(0)  mustEqual pass
-    validator(1)  mustEqual fail("fail")
+    validator(0) mustEqual pass
+    validator(1) mustEqual fail("fail")
     validator(-1) mustEqual fail("fail")
   }
 
   "neq" >> {
     val validator = neq(0, "fail")
-    validator(0)  mustEqual fail("fail")
-    validator(1)  mustEqual pass
+    validator(0) mustEqual fail("fail")
+    validator(1) mustEqual pass
     validator(-1) mustEqual pass
   }
 
   "lt" >> {
     val validator = lt(0, "fail")
-    validator(0)  mustEqual fail("fail")
-    validator(1)  mustEqual fail("fail")
+    validator(0) mustEqual fail("fail")
+    validator(1) mustEqual fail("fail")
     validator(-1) mustEqual pass
   }
 
   "lte" >> {
     val validator = lte(0, "fail")
-    validator(0)  mustEqual pass
-    validator(1)  mustEqual fail("fail")
+    validator(0) mustEqual pass
+    validator(1) mustEqual fail("fail")
     validator(-1) mustEqual pass
   }
 
   "gt" >> {
     val validator = gt(0, "fail")
-    validator(0)  mustEqual fail("fail")
-    validator(1)  mustEqual pass
+    validator(0) mustEqual fail("fail")
+    validator(1) mustEqual pass
     validator(-1) mustEqual fail("fail")
   }
 
   "gte" >> {
     val validator = gte(0, "fail")
-    validator(0)  mustEqual pass
-    validator(1)  mustEqual pass
+    validator(0) mustEqual pass
+    validator(1) mustEqual pass
     validator(-1) mustEqual fail("fail")
   }
-  
+
   "nonEmpty" >> {
     val validator = nonEmpty[String]("fail")
-    validator("")  mustEqual fail("fail")
+    validator("") mustEqual fail("fail")
     validator(" ") mustEqual pass
   }
 
   "nonEmpty non String" >> {
     val validator = nonEmpty[Seq[Int]]("fail")
-    validator(List():List[Int])  mustEqual fail("fail")
-    validator(List(1,2,3,4,5,6)) mustEqual pass
-  }  
-  
-  "lengthLt"  >> {
-    val validator = lengthLt[Seq[Int]](6)
-    validator(List(1,2,3,4,5,6))   mustEqual fail("Length must be less than 6")
-    validator(List():List[Int])    mustEqual pass
+    validator(List(): List[Int]) mustEqual fail("fail")
+    validator(List(1, 2, 3, 4, 5, 6)) mustEqual pass
   }
-  
+
+  "lengthLt" >> {
+    val validator = lengthLt[Seq[Int]](6)
+    validator(List(1, 2, 3, 4, 5, 6)) mustEqual fail("Length must be less than 6")
+    validator(List(): List[Int]) mustEqual pass
+  }
+
   "lengthLte" >> {
     val validator = lengthLte[Seq[Int]](6)
-    validator(List(1,2,3,4,5,6))     mustEqual pass
-    validator(List(1,2,3,4,5,6,7))   mustEqual fail("Length must be at most 6")    
-  }  
-  
-  "lengthGt"  >> {
+    validator(List(1, 2, 3, 4, 5, 6)) mustEqual pass
+    validator(List(1, 2, 3, 4, 5, 6, 7)) mustEqual fail("Length must be at most 6")
+  }
+
+  "lengthGt" >> {
     val validator = lengthGt[Seq[Int]](6)
-    validator(List(1,2,3,4,5,6))    mustEqual fail("Length must be more than 6")
-    validator(List(1,2,3,4,5,6,7))  mustEqual pass     
-  }  
-  
+    validator(List(1, 2, 3, 4, 5, 6)) mustEqual fail("Length must be more than 6")
+    validator(List(1, 2, 3, 4, 5, 6, 7)) mustEqual pass
+  }
+
   "lengthGte" >> {
     val validator = lengthGte[Seq[Int]](6)
-    validator(List(1,2,3,4,5))    mustEqual fail("Length must be at least 6")
-    validator(List(1,2,3,4,5,6))  mustEqual pass     
+    validator(List(1, 2, 3, 4, 5)) mustEqual fail("Length must be at least 6")
+    validator(List(1, 2, 3, 4, 5, 6)) mustEqual pass
   }
 
   "matchesRegex" >> {
     val validator = matchesRegex("^[^@]+@[^@]+$".r, "Must be an email")
-    validator("dave@example.com")  mustEqual pass
-    validator("dave@")             mustEqual fail("Must be an email")
-    validator("@example.com")      mustEqual fail("Must be an email")
+    validator("dave@example.com") mustEqual pass
+    validator("dave@") mustEqual fail("Must be an email")
+    validator("@example.com") mustEqual fail("Must be an email")
     validator("dave@@example.com") mustEqual fail("Must be an email")
   }
 
