@@ -16,7 +16,7 @@ lazy val validation = crossProject(JSPlatform, JVMPlatform).in(file(".")).
     scalacOptions ++= Seq("-deprecation", "-feature"),
     organization := "io.underscore",
     name := "validation",
-    version := "0.0.6-SNAPSHOT",
+    version := "0.0.6",
     publishTo := Some(Resolver.file("file", new File("../maven-repo"))),
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,

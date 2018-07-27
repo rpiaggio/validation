@@ -41,6 +41,9 @@ class MonadicValidatorSpec extends Specification {
     override def apply[A](i: IO[A]): Future[A] = i.unsafeToFuture
   }
 
+  // We could allow parallel execution of Tasks with the following line, but the ParallelApplicative is private for the moment.
+//  implicit val ap: Applicative[Task] = ParallelApplicative(new CatsParallelForTask)
+
   "Future unique email" >> { implicit ec: ExecutionContext =>
     val validator = isEmail and isUniqueFuture
     Await.result(validator("dave@example.com"), Duration.Inf) mustEqual pass
@@ -92,4 +95,6 @@ class MonadicValidatorSpec extends Specification {
     Await.result(validator("raul@"), Duration.Inf)            mustEqual fail("Must be an email")
     Await.result(validator(""), Duration.Inf).map(_.message)  must contain("Must be an email", "Must not be empty")
   }
+
+//  MONADIC + MACRO
 }
