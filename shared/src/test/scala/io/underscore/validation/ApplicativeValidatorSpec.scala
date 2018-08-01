@@ -14,7 +14,7 @@ import monix.execution.Scheduler.Implicits.global
 import scala.language.higherKinds
 import scala.language.postfixOps
 
-class MonadicValidatorSpec extends Specification {
+class ApplicativeValidatorSpec extends Specification {
 
   val db = HashSet("raul@example.com", "contributor@example.com")
   def existsInDBFuture(email: String): Future[Boolean] = Future.successful(db.contains(email))
@@ -42,7 +42,8 @@ class MonadicValidatorSpec extends Specification {
   }
 
   // We could allow parallel execution of Tasks with the following line, but the ParallelApplicative is private for the moment.
-//  implicit val ap: Applicative[Task] = ParallelApplicative(new CatsParallelForTask)
+  //  implicit val ap: Applicative[Task] = ParallelApplicative(new CatsParallelForTask)
+  // Alternative, wait for Cats issue to be implemented: https://github.com/typelevel/cats/pull/2019
 
   "Future unique email" >> { implicit ec: ExecutionContext =>
     val validator = isEmail and isUniqueFuture

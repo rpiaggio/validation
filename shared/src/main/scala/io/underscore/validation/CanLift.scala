@@ -4,7 +4,7 @@ import cats._
 import scala.language.higherKinds
 
 trait NaturalTransformationLowPriorityImplicits {
-  implicit def ApplicativeTransform[F[_] : Applicative]: Id ~> F = new (Id ~> F) {
+  implicit def applicativeTransform[F[_] : Applicative]: Id ~> F = new (Id ~> F) {
     override def apply[A](a: Id[A]): F[A] = Applicative[F].pure(a)
   }
 }

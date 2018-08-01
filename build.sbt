@@ -1,4 +1,4 @@
-import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject}
+import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
 scalaVersion in ThisBuild := "2.12.6"
 
@@ -16,7 +16,7 @@ lazy val validation = crossProject(JSPlatform, JVMPlatform).in(file(".")).
     scalacOptions ++= Seq("-deprecation", "-feature"),
     organization := "io.underscore",
     name := "validation",
-    version := "0.0.6",
+    version := "0.0.7",
     publishTo := Some(Resolver.file("file", new File("../maven-repo"))),
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,

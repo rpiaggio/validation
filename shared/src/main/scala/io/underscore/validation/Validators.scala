@@ -1,6 +1,6 @@
 package io.underscore.validation
 
-import cats.{Id, _}
+import cats._
 import cats.implicits._
 
 import Emptyable._
@@ -15,8 +15,8 @@ object Validators extends Validators
 
 trait Validators {
 
-  implicit private def liftResult[F[_] : Monad](result: Seq[ValidationResult]): F[Seq[ValidationResult]] =
-    implicitly[Monad[F]].pure(result)
+  implicit private def liftResult[F[_] : Applicative](result: Seq[ValidationResult]): F[Seq[ValidationResult]] =
+    implicitly[Applicative[F]].pure(result)
 
   def pass: Seq[ValidationResult] =
     Seq.empty
@@ -32,7 +32,7 @@ trait Validators {
   def validate[A]: Validator[A, Id] = Validator[A]
 
   class TestGenerator[A] protected[validation](msg: => String) {
-    def apply[F[_] : Monad](func: A => F[Boolean]): Validator[A, F] =
+    def apply[F[_] : Applicative](func: A => F[Boolean]): Validator[A, F] =
       Validator[A, F] { in => func(in).map { valid => if (valid) pass else fail(msg) } }
 
     def apply(func: A => Boolean): Validator[A, Id] = apply[Id](func)
@@ -40,17 +40,17 @@ trait Validators {
 
   def test[A](msg: => String = "") = new TestGenerator[A](msg)
 
-  def warn[A, F[_] : Monad](rule: Validator[A, F]): Validator[A, F] =
+  def warn[A, F[_] : Applicative](rule: Validator[A, F]): Validator[A, F] =
     Validator[A, F] { in => rule(in).map(_.toWarnings) }
 
-  def optional[A, F[_] : Monad](rule: Validator[A, F]): Validator[Option[A], F] =
-    Validator[Option[A], F] { in => in map rule getOrElse liftResult(pass)(implicitly[Monad[F]]) }
+  def optional[A, F[_] : Applicative](rule: Validator[A, F]): Validator[Option[A], F] =
+    Validator[Option[A], F] { in => in map rule getOrElse liftResult(pass)(implicitly[Applicative[F]]) }
 
-  def required[A, F[_] : Monad](rule: Validator[A, F]): Validator[Option[A], F] =
+  def required[A, F[_] : Applicative](rule: Validator[A, F]): Validator[Option[A], F] =
     required("Value is required", rule)
 
-  def required[A, F[_] : Monad](msg: => String, rule: Validator[A, F]): Validator[Option[A], F] =
-    Validator[Option[A], F] { in => in map rule getOrElse liftResult(fail(msg))(implicitly[Monad[F]]) }
+  def required[A, F[_] : Applicative](msg: => String, rule: Validator[A, F]): Validator[Option[A], F] =
+    Validator[Option[A], F] { in => in map rule getOrElse liftResult(fail(msg))(implicitly[Applicative[F]]) }
 
   def eql[A](comp: A): Validator[A, Id] =
     eql(comp, s"Must be $comp")
