@@ -17,8 +17,7 @@ abstract class Validator[A, F[_] : Applicative] extends (A => F[Seq[ValidationRe
 
   private def andSame(that: Validator[A, F]): Validator[A, F] =
     Validator[A, F] { in =>
-//      (this(in), that(in)).map2(_ ++ _) // What import do we need for this syntax???
-      Apply[F].map2(this (in), that(in))(_ ++ _)
+      (this(in), that(in)).mapN(_ ++ _)
     }
 
   def and[G[_] : Applicative, R[_]](that: Validator[A, G])(implicit canLift: CanLift[F, G, R]): Validator[A, R] = {
